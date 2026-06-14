@@ -1,5 +1,6 @@
 using System.Text;
 using HospitalManagement.Server.Data;
+using HospitalManagement.Server.Services;
 using HospitalManagement.Server.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -46,6 +47,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+
+// --- Application Services ---
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // --- SignalR ---
 builder.Services.AddSignalR();

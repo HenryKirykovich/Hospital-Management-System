@@ -65,18 +65,7 @@ partial class PatientListForm
         this.btnRefresh.Cursor = Cursors.Hand;
         this.btnRefresh.Click += new EventHandler(this.btnRefresh_Click);
 
-        this.btnAdd.Text = "+ Add Patient";
-        this.btnAdd.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-        this.btnAdd.BackColor = Color.FromArgb(30, 160, 80);
-        this.btnAdd.ForeColor = Color.White;
-        this.btnAdd.FlatStyle = FlatStyle.Flat;
-        this.btnAdd.FlatAppearance.BorderSize = 0;
-        this.btnAdd.Location = new Point(960, 16);
-        this.btnAdd.Size = new Size(120, 32);
-        this.btnAdd.Cursor = Cursors.Hand;
-        this.btnAdd.Click += new EventHandler(this.btnAdd_Click);
-
-        this.pnlTop.Controls.AddRange(new Control[] { lblTitle, txtSearch, btnRefresh, btnAdd });
+        this.pnlTop.Controls.AddRange(new Control[] { lblTitle, txtSearch, btnRefresh });
 
         // --- Toolbar Panel ---
         this.pnlToolbar.BackColor = Color.FromArgb(248, 249, 252);
@@ -108,20 +97,31 @@ partial class PatientListForm
         this.btnHistory.Cursor = Cursors.Hand;
         this.btnHistory.Click += new EventHandler(this.btnHistory_Click);
 
+        this.btnAdd.Text = "+ Add Patient";
+        this.btnAdd.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+        this.btnAdd.BackColor = Color.FromArgb(30, 160, 80);
+        this.btnAdd.ForeColor = Color.White;
+        this.btnAdd.FlatStyle = FlatStyle.Flat;
+        this.btnAdd.FlatAppearance.BorderSize = 0;
+        this.btnAdd.Location = new Point(380, 8);
+        this.btnAdd.Size = new Size(130, 28);
+        this.btnAdd.Cursor = Cursors.Hand;
+        this.btnAdd.Click += new EventHandler(this.btnAdd_Click);
+
         this.lblCount.ForeColor = Color.Gray;
         this.lblCount.Font = new Font("Segoe UI", 9F);
-        this.lblCount.Location = new Point(380, 12);
+        this.lblCount.Location = new Point(524, 12);
         this.lblCount.Size = new Size(200, 20);
 
         this.lblStatus.Text = "Loading...";
         this.lblStatus.ForeColor = Color.Gray;
         this.lblStatus.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
-        this.lblStatus.Location = new Point(600, 12);
+        this.lblStatus.Location = new Point(730, 12);
         this.lblStatus.Size = new Size(120, 20);
         this.lblStatus.Visible = false;
 
         this.pnlToolbar.Controls.AddRange(new Control[]
-            { btnEdit, btnDelete, btnHistory, lblCount, lblStatus });
+            { btnEdit, btnDelete, btnHistory, btnAdd, lblCount, lblStatus });
 
         // --- DataGridView ---
         this.dgvPatients.Dock = DockStyle.Fill;

@@ -20,6 +20,11 @@ public partial class PatientListForm : Form
     protected override async void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
+        // Set initial button states based on role before loading data
+        btnAdd.Enabled = ClientSession.IsStaff;
+        btnDelete.Enabled = false;
+        btnEdit.Enabled = false;
+        btnHistory.Enabled = false;
         await LoadPatientsAsync();
     }
 
@@ -178,5 +183,4 @@ public partial class PatientListForm : Form
         btnRefresh.Enabled = !busy;
         Cursor = busy ? Cursors.WaitCursor : Cursors.Default;
         lblStatus.Visible = busy;
-    }
-}
+    }}

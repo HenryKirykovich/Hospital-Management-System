@@ -17,8 +17,8 @@ public static class ApiClient
         PropertyNameCaseInsensitive = true
     };
 
-    // Server base URL — can be moved to app config later
-    public const string BaseUrl = "https://localhost:7001";
+    // Server base URL — matches launchSettings.json http profile
+    public const string BaseUrl = "http://localhost:5066";
 
     static ApiClient()
     {

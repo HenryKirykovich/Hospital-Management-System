@@ -37,7 +37,8 @@ HospitalManagementSystem/
 │   │   ├── ChatMessage.cs
 │   │   └── PatientVitals.cs
 │   └── DTOs/
-│       └── AuthDTOs.cs
+│       ├── AuthDTOs.cs
+│       └── AnalyticsDTOs.cs
 │
 ├── HospitalManagement.Server/          ← ASP.NET Core Web API
 │   ├── Controllers/
@@ -244,7 +245,7 @@ dotnet run
 │       └────────────────────────────────────┘                    │
 │                          │                                      │
 │                          ▼                                      │
-│  [✓] Stage 4  ──►  [ ] Stage 5  ──►  [ ] Stage 6              │
+│  [✓] Stage 4  ──►  [✓] Stage 5  ──►  [✓] Stage 6              │
 │  Appointments       Inventory          Analytics +              │
 │  + SignalR          + Alerts           Dashboard                │
 │                          │                                      │
@@ -435,42 +436,127 @@ NoShow     → Yellow (#FFF0C8)
 
 ---
 
-### ⬜ Stage 5 — Medical Inventory Management
-**Status: IN PROGRESS**
+### ✅ Stage 5 — Medical Inventory Management
+**Status: COMPLETE** | Commit: `10e2ff2`
 
-**Planned:**
-- `InventoryService` + `InventoryController`: CRUD for medications/supplies/equipment
-- `PATCH /api/inventory/{id}/restock`: add stock quantity
-- SignalR `LowStockAlert` broadcast when quantity drops below threshold
-- `InventoryListForm`: DataGridView with red highlighting for low-stock items
-- `InventoryEditForm`: add/edit items with threshold and expiry date
-- Real-time stock level updates for all connected staff
+**What was done:**
+- `IInventoryService` + `InventoryService`: full CRUD, regex search (name/category/supplier), restock, low-stock query
+- `InventoryController`: 7 endpoints + SignalR broadcasts on every change
+- `PATCH /api/inventory/{id}/restock` — adds quantity, broadcasts updated item to all clients
+- `LowStockAlert` via SignalR → sent to Admin/Doctor/Nurse groups when stock ≤ threshold
+- `InventoryListForm`: DataGridView with **red row highlighting** for low-stock items
+  - Real-time updates (InventoryUpdated / InventoryDeleted / LowStockAlert)
+  - Search bar (400ms debounce), ⚠ Low Stock filter toggle
+  - Role-based buttons: Add/Edit/Restock for staff, Delete for Admin only
+  - Notification bar auto-hides after 5 seconds
+- `InventoryEditForm`: category dropdown (Medication/Supply/Equipment), threshold, price, expiry date
+- `RestockDialog`: compact dialog showing current stock, accepts add quantity
+- `ApiClient`: added `PatchAsync` method
+- `SignalRService`: typed `InventoryItem` event, added `OnInventoryDeleted`
+- Seeded data: 3 items pre-set as low-stock for immediate testing
 
-**Key files (to be created):**
+**Key files to review:**
 ```
 HospitalManagement.Server/
-  Services/InventoryService.cs
-  Controllers/InventoryController.cs
+  Services/IInventoryService.cs    ← Contract: CRUD + restock + low-stock query
+  Services/InventoryService.cs     ← MongoDB implementation with regex search
+  Controllers/InventoryController.cs ← 7 endpoints + SignalR LowStockAlert
 
 HospitalManagement.Client/
-  Forms/InventoryListForm.cs
-  Forms/InventoryEditForm.cs
+  Forms/InventoryListForm.cs       ← Grid with red low-stock rows + real-time SignalR
+  Forms/InventoryEditForm.cs       ← Add/Edit form with all fields
+  Forms/RestockDialog.cs           ← Quick restock quantity dialog
+```
+
+**API Endpoints:**
+```
+GET    /api/inventory               → All items (sorted by category, name)
+GET    /api/inventory/low-stock     → Items at or below threshold
+GET    /api/inventory/search?q=...  → Search by name, category, supplier
+GET    /api/inventory/{id}          → Single item
+POST   /api/inventory               → Create (Admin/Doctor/Nurse)
+PUT    /api/inventory/{id}          → Update (Admin/Doctor/Nurse)
+PATCH  /api/inventory/{id}/restock  → Add stock (Admin/Doctor/Nurse)
+DELETE /api/inventory/{id}          → Delete (Admin only)
+```
+
+**Low-Stock Flow:**
+```
+Item quantity falls to or below lowStockThreshold
+        │
+        ▼
+InventoryController detects item.IsLowStock == true
+        │
+        ▼
+_hub.Clients.Groups("Admin","Doctor","Nurse")
+  .SendAsync("LowStockAlert", { name, quantity, threshold })
+        │
+        ├──► InventoryListForm row turns red
+        └──► Notification bar: "⚠ LOW STOCK: Ibuprofen — 8 units remaining"
 ```
 
 ---
 
-### ⬜ Stage 6 — Analytics, Reports & Dashboard
-**Status: NOT STARTED**
+### ✅ Stage 6 — Analytics, Reports & Dashboard
+**Status: COMPLETE** | Commit: `7a3249d`
 
-**Planned:**
-- `AnalyticsController`: aggregate MongoDB queries for statistics
-- Report: patient visits per period
-- Report: most common diagnoses
-- Report: medication usage trends
-- Report: doctor workload
-- `DashboardForm`: live stats panel with SignalR updates
-- Bed availability display
-- Emergency status board
+**What was done:**
+- `AnalyticsDTOs` (Shared): `OverviewStats`, `AppointmentsByStatus`, `MonthlyAppointments`, `InventoryByCategory`, `DashboardData`
+- `IAnalyticsService` + `AnalyticsService`: all aggregations run in parallel via `Task.WhenAll`
+  - Total/active patients, total staff, appointments today / this month / pending
+  - Appointments grouped by status (Scheduled / Confirmed / Completed / Cancelled / NoShow)
+  - Monthly appointment counts for last 6 months
+  - Inventory by category with low-stock counts
+- `AnalyticsController`: `GET /api/analytics/dashboard` (staff only)
+- `DashboardForm` (Client): pure GDI+ rendering — no third-party charting library
+  - **6 stat cards** with accent color: Patients, Staff, Appts Today, Appts Month, Pending, Low Stock
+  - **Vertical bar chart**: Appointments by Status (5 bars, color-coded)
+  - **Line chart** with filled area gradient: Monthly appointment trend (last 6 months)
+  - **Horizontal bar chart**: Inventory by category with quantity + low-stock count
+  - ↻ Refresh button + last-updated timestamp
+- MainForm: Dashboard and Analytics sidebar buttons both wired to `DashboardForm`
+
+**Key files to review:**
+```
+HospitalManagement.Shared/
+  DTOs/AnalyticsDTOs.cs            ← All analytics data transfer objects
+
+HospitalManagement.Server/
+  Services/IAnalyticsService.cs    ← Contract
+  Services/AnalyticsService.cs     ← Parallel MongoDB aggregations
+  Controllers/AnalyticsController.cs ← GET /api/analytics/dashboard
+
+HospitalManagement.Client/
+  Forms/DashboardForm.cs           ← GDI+ stat cards + 3 charts
+```
+
+**API Endpoints:**
+```
+GET /api/analytics/dashboard  → Full DashboardData (Admin/Doctor/Nurse)
+```
+
+**Dashboard Data Flow:**
+```
+DashboardForm.OnLoad()
+        │
+        ▼
+GET /api/analytics/dashboard
+        │
+        ▼
+AnalyticsService.GetDashboardDataAsync()
+  ├── CountDocumentsAsync(patients)
+  ├── CountDocumentsAsync(staff)
+  ├── CountDocumentsAsync(appointments today)
+  ├── CountDocumentsAsync(appointments this month)
+  ├── CountDocumentsAsync(pending appointments)
+  ├── Find all appointments → group by status + by month
+  └── Find all inventory   → group by category
+        │
+        ▼
+DashboardForm.UpdateUI()
+  ├── 6 stat cards updated with live values
+  └── 3 GDI+ charts redrawn (Invalidate)
+```
 
 ---
 
@@ -497,6 +583,10 @@ HospitalManagement.Client/
 | `fc8a24a` | Fix     | Add Patient button moved to toolbar, role-based visibility |
 | `53e4178` | Stage 4 | Appointments + SignalR real-time notifications |
 | `0de2b34` | Fix     | BsonObjectId removed from FK fields; DataSeeder added |
+| `6f1f35d` | Docs    | PROJECT.md created — full documentation |
+| `e223f41` | Docs    | ACCOUNTS.md created — all test login credentials |
+| `10e2ff2` | Stage 5 | Inventory management + SignalR low-stock alerts |
+| `7a3249d` | Stage 6 | Analytics dashboard with GDI+ charts |
 
 ---
 

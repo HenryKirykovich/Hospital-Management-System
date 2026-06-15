@@ -250,7 +250,7 @@ dotnet run
 │  + SignalR          + Alerts           Dashboard                │
 │                          │                                      │
 │                          ▼                                      │
-│                    [ ] Stage 7                                  │
+│                    [✓] Stage 7                                  │
 │                    Real-time Chat +                             │
 │                    Vitals Monitor                               │
 └─────────────────────────────────────────────────────────────────┘
@@ -560,15 +560,84 @@ DashboardForm.UpdateUI()
 
 ---
 
-### ⬜ Stage 7 — Real-time Communication
-**Status: NOT STARTED**
+### ✅ Stage 7 — Real-time Chat + Vitals Monitor
+**Status: COMPLETE** | Commit: `37788fc`
 
-**Planned:**
-- `ChatController`: save/load messages from `chat_messages` collection
-- `ChatForm` (WinForms): real-time chat between staff and patients
-- Channel-based messaging (general, emergency, private patient channels)
-- Patient vitals monitoring: `VitalsForm` with live updating charts
-- Push notifications for emergency events via SignalR
+**What was done:**
+- `IChatService` + `ChatService`: persist chat messages to MongoDB, load channel history (last 50, oldest first), mark-channel-read
+- `IVitalsService` + `VitalsService`: record vitals with automatic critical detection (HR/BP/Temp/O₂ outside safe range), latest-per-patient query
+- `HospitalHub.SendMessage(channel, content)`: client invokes this to send a message → saved to DB → broadcast to channel group via `Clients.Group(channel).SendAsync("ChatMessage", msg)`
+  - Emergency messages also trigger a `Notification` to all staff groups
+- `ChatController`: `GET /api/chat/{channel}` (load history), `POST /api/chat/{channel}/read`
+- `VitalsController`: `GET /api/vitals` (latest per patient), `GET /api/vitals/critical`, `GET /api/vitals/patient/{id}`, `POST /api/vitals` → broadcasts `VitalsUpdate` + `Notification` on critical
+- `ChatForm` (Client):
+  - Dark sidebar with 3 channels: `# general`, `🚨 emergency`, `👨‍⚕️ staff`
+  - Joins/leaves SignalR group on channel switch
+  - Loads history from REST API on open, receives new messages live
+  - Enter key sends; own messages styled in blue
+- `VitalsMonitorForm` (Client):
+  - Grid of all monitored patients — red rows for critical
+  - Real-time updates via SignalR `VitalsUpdate`
+  - Staff can record new vitals, double-click opens history dialog
+  - Window title shows critical patient count
+- `VitalsEntryForm`: 5-parameter vitals entry form
+- `VitalsHistoryForm`: per-patient history dialog (last 20 records)
+- `SignalRService`: typed `ChatMessage` + `PatientVitals` events, `SendMessageAsync()`
+- `MainForm`: Chat → `ChatForm`, Vitals → `VitalsMonitorForm`
+
+**Key files to review:**
+```
+HospitalManagement.Server/
+  Services/IChatService.cs         ← Contract
+  Services/ChatService.cs          ← MongoDB persist + channel history
+  Services/IVitalsService.cs       ← Contract
+  Services/VitalsService.cs        ← Critical detection logic
+  Controllers/ChatController.cs    ← GET history, POST mark-read
+  Controllers/VitalsController.cs  ← Record vitals + SignalR broadcast
+  Hubs/HospitalHub.cs              ← SendMessage hub method (updated)
+
+HospitalManagement.Client/
+  Forms/ChatForm.cs                ← Real-time chat with channel sidebar
+  Forms/VitalsMonitorForm.cs       ← Live monitoring board
+  Forms/VitalsEntryForm.cs         ← Record vitals dialog
+  Forms/VitalsHistoryForm.cs       ← Patient vitals history dialog
+```
+
+**API Endpoints:**
+```
+GET    /api/chat/{channel}?limit=50   → Channel message history
+POST   /api/chat/{channel}/read       → Mark all unread as read
+
+GET    /api/vitals                    → Latest vitals per patient
+GET    /api/vitals/critical           → All critical entries
+GET    /api/vitals/patient/{id}       → Patient history
+POST   /api/vitals                    → Record + broadcast
+```
+
+**Chat Flow:**
+```
+ChatForm: user types + presses Enter
+        │
+        ▼
+SignalRService.SendMessageAsync(channel, content)
+        │
+        ▼
+HospitalHub.SendMessage(channel, content) [server]
+  ├── ChatService.SaveMessageAsync(message)  → MongoDB
+  └── Clients.Group(channel).SendAsync("ChatMessage", msg)
+        │
+        ├──► ChatForm A: message appears in real time
+        └──► ChatForm B: same message delivered instantly
+```
+
+**Critical Vitals Thresholds:**
+```
+Heart Rate:    < 50  or  > 120 bpm
+BP Systolic:   < 80  or  > 160 mmHg
+BP Diastolic:  < 50  or  > 100 mmHg
+Temperature:   < 35.0 or > 39.0 °C
+O₂ Saturation: < 92%
+```
 
 ---
 
@@ -587,6 +656,8 @@ DashboardForm.UpdateUI()
 | `e223f41` | Docs    | ACCOUNTS.md created — all test login credentials |
 | `10e2ff2` | Stage 5 | Inventory management + SignalR low-stock alerts |
 | `7a3249d` | Stage 6 | Analytics dashboard with GDI+ charts |
+| `b643b1d` | Docs    | PROJECT.md updated — stages 5 + 6 details |
+| `37788fc` | Stage 7 | Real-time Chat + Vitals Monitor |
 
 ---
 

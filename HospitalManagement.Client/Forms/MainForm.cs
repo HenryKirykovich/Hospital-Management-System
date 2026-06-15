@@ -29,11 +29,11 @@ public partial class MainForm : Form
     {
         var menuItems = new List<(string Text, Action OnClick)>
         {
-            ("🏠  Dashboard",    () => ShowPlaceholder("Dashboard — coming in Stage 6")),
+            ("🏠  Dashboard",    () => OpenForm(new DashboardForm())),
             ("👥  Patients",     () => OpenForm(new PatientListForm())),
             ("📅  Appointments", () => OpenForm(new AppointmentListForm())),
             ("💊  Inventory",    () => OpenForm(new InventoryListForm())),
-            ("📊  Analytics",    () => ShowPlaceholder("Analytics — coming in Stage 6")),
+            ("📊  Analytics",    () => OpenForm(new DashboardForm())),
             ("💬  Chat",         () => ShowPlaceholder("Chat — coming in Stage 7")),
         };
 

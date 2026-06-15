@@ -31,7 +31,7 @@ public partial class MainForm : Form
         {
             ("🏠  Dashboard",    () => ShowPlaceholder("Dashboard — coming in Stage 6")),
             ("👥  Patients",     () => OpenForm(new PatientListForm())),
-            ("📅  Appointments", () => ShowPlaceholder("Appointments — coming in Stage 4")),
+            ("📅  Appointments", () => OpenForm(new AppointmentListForm())),
             ("💊  Inventory",    () => ShowPlaceholder("Inventory — coming in Stage 5")),
             ("📊  Analytics",    () => ShowPlaceholder("Analytics — coming in Stage 6")),
             ("💬  Chat",         () => ShowPlaceholder("Chat — coming in Stage 7")),
@@ -94,6 +94,7 @@ public partial class MainForm : Form
 
         if (confirm == DialogResult.Yes)
         {
+            _ = AppServices.DisposeAsync();
             ClientSession.Clear();
             var loginForm = new LoginForm();
             loginForm.Show();

@@ -43,6 +43,9 @@ public partial class LoginForm : Form
             // Store session data globally
             ClientSession.SetSession(response);
 
+            // Start SignalR connection in background after login
+            _ = AppServices.InitializeAsync();
+
             // Open the main form and close the login window
             var mainForm = new MainForm();
             mainForm.Show();

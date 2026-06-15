@@ -53,6 +53,10 @@ public class Patient
 
     [BsonElement("isActive")]
     public bool IsActive { get; set; } = true;
+
+    /// <summary>Computed display name for UI dropdowns — not stored in MongoDB</summary>
+    [BsonIgnore]
+    public string FullNameDisplay => $"{FirstName} {LastName}";
 }
 
 /// <summary>

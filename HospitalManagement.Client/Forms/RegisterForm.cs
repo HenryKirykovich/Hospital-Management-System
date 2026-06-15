@@ -44,6 +44,9 @@ public partial class RegisterForm : Form
             // Auto-login after successful registration
             ClientSession.SetSession(response);
 
+            // Start SignalR connection in background
+            _ = AppServices.InitializeAsync();
+
             MessageBox.Show($"Welcome, {response.FullName}!\nYour account has been created.",
                 "Registration Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
 

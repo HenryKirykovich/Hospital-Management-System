@@ -1,5 +1,6 @@
 using System.Text;
 using HospitalManagement.Server.Data;
+using HospitalManagement.Server.Hubs;
 using HospitalManagement.Server.Services;
 using HospitalManagement.Server.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -50,6 +51,7 @@ builder.Services.AddAuthorization();
 // --- Application Services ---
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
 // --- SignalR ---
 builder.Services.AddSignalR();
@@ -79,7 +81,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-// SignalR hubs will be mapped here as they are created in later steps
-// app.MapHub<HospitalHub>("/hubs/hospital");
+// SignalR hub for real-time notifications, chat, and vitals monitoring
+app.MapHub<HospitalHub>("/hubs/hospital");
 
 app.Run();

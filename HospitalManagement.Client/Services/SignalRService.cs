@@ -21,8 +21,8 @@ public class SignalRService : IAsyncDisposable
     public event Action<InventoryItem>? OnInventoryUpdated;
     public event Action<string>? OnInventoryDeleted;
     public event Action<object>? OnLowStockAlert;
-    public event Action<object>? OnChatMessage;
-    public event Action<object>? OnVitalsUpdate;
+    public event Action<ChatMessage>? OnChatMessage;
+    public event Action<PatientVitals>? OnVitalsUpdate;
     public event Action<string>? OnNotification;
 
     public bool IsConnected => _connection?.State == HubConnectionState.Connected;
@@ -78,10 +78,10 @@ public class SignalRService : IAsyncDisposable
         _connection.On<object>("LowStockAlert",
             data => OnLowStockAlert?.Invoke(data));
 
-        _connection.On<object>("ChatMessage",
+        _connection.On<ChatMessage>("ChatMessage",
             data => OnChatMessage?.Invoke(data));
 
-        _connection.On<object>("VitalsUpdate",
+        _connection.On<PatientVitals>("VitalsUpdate",
             data => OnVitalsUpdate?.Invoke(data));
 
         _connection.On<string>("Notification",
@@ -118,5 +118,12 @@ public class SignalRService : IAsyncDisposable
     {
         if (_connection is not null)
             await _connection.DisposeAsync();
+    }
+
+    /// <summary>Sends a chat message to a channel via the SignalR hub</summary>
+    public async Task SendMessageAsync(string channel, string content)
+    {
+        if (_connection is not null && IsConnected)
+            await _connection.InvokeAsync("SendMessage", channel, content);
     }
 }

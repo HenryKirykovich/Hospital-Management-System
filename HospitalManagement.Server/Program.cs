@@ -55,6 +55,8 @@ builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IVitalsService, VitalsService>();
 
 // --- SignalR ---
 builder.Services.AddSignalR();

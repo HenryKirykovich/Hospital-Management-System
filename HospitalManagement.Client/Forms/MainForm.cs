@@ -34,7 +34,8 @@ public partial class MainForm : Form
             ("📅  Appointments", () => OpenForm(new AppointmentListForm())),
             ("💊  Inventory",    () => OpenForm(new InventoryListForm())),
             ("📊  Analytics",    () => OpenForm(new DashboardForm())),
-            ("💬  Chat",         () => ShowPlaceholder("Chat — coming in Stage 7")),
+            ("💬  Chat",         () => OpenForm(new ChatForm())),
+            ("🩺  Vitals",       () => OpenForm(new VitalsMonitorForm())),
         };
 
         int y = 60;

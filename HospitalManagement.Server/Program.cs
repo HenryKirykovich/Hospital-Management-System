@@ -4,7 +4,6 @@ using HospitalManagement.Server.Services;
 using HospitalManagement.Server.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // --- MongoDB ---
@@ -50,6 +49,7 @@ builder.Services.AddAuthorization();
 
 // --- Application Services ---
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPatientService, PatientService>();
 
 // --- SignalR ---
 builder.Services.AddSignalR();

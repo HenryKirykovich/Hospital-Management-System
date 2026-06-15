@@ -20,7 +20,6 @@ partial class MainForm
         this.pnlSidebar = new Panel();
         this.lblMenuTitle = new Label();
         this.pnlContent = new Panel();
-        this.lblPlaceholder = new Label();
         this.pnlHeader.SuspendLayout();
         this.pnlSidebar.SuspendLayout();
         this.pnlContent.SuspendLayout();
@@ -87,13 +86,7 @@ partial class MainForm
         this.pnlContent.Dock = DockStyle.Fill;
         this.pnlContent.Padding = new Padding(20);
 
-        this.lblPlaceholder.Text = "Dashboard — coming in Stage 6\n\nAuthentication is complete.\nYou are successfully logged in!";
-        this.lblPlaceholder.Font = new Font("Segoe UI", 12F);
-        this.lblPlaceholder.ForeColor = Color.Gray;
-        this.lblPlaceholder.TextAlign = ContentAlignment.MiddleCenter;
-        this.lblPlaceholder.Dock = DockStyle.Fill;
-
-        this.pnlContent.Controls.Add(lblPlaceholder);
+        this.pnlContent.Controls.Clear();  // content loaded dynamically via sidebar
 
         // --- Assemble ---
         this.Controls.Add(pnlContent);
@@ -113,5 +106,4 @@ partial class MainForm
     private Panel pnlSidebar;
     private Label lblMenuTitle;
     private Panel pnlContent;
-    private Label lblPlaceholder;
 }

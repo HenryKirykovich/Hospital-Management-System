@@ -14,11 +14,9 @@ public class Appointment
     public string? Id { get; set; }
 
     [BsonElement("patientId")]
-    [BsonRepresentation(BsonType.ObjectId)]
     public string PatientId { get; set; } = string.Empty;
 
     [BsonElement("doctorId")]
-    [BsonRepresentation(BsonType.ObjectId)]
     public string DoctorId { get; set; } = string.Empty;
 
     /// <summary>Denormalized names for quick display without extra lookups</summary>

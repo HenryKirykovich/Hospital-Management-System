@@ -14,7 +14,6 @@ public class PatientVitals
     public string? Id { get; set; }
 
     [BsonElement("patientId")]
-    [BsonRepresentation(BsonType.ObjectId)]
     public string PatientId { get; set; } = string.Empty;
 
     [BsonElement("patientName")]

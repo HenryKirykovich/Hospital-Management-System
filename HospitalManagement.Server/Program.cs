@@ -1,6 +1,7 @@
 using System.Text;
 using HospitalManagement.Server.Data;
 using HospitalManagement.Server.Hubs;
+using HospitalManagement.Server.Seeds;
 using HospitalManagement.Server.Services;
 using HospitalManagement.Server.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -83,5 +84,13 @@ app.UseAuthorization();
 app.MapControllers();
 // SignalR hub for real-time notifications, chat, and vitals monitoring
 app.MapHub<HospitalHub>("/hubs/hospital");
+
+// Seed database with sample data on first startup (Development only)
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
+    await DataSeeder.SeedAsync(db);
+}
 
 app.Run();

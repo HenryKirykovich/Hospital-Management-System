@@ -14,14 +14,12 @@ public class ChatMessage
     public string? Id { get; set; }
 
     [BsonElement("senderId")]
-    [BsonRepresentation(BsonType.ObjectId)]
     public string SenderId { get; set; } = string.Empty;
 
     [BsonElement("senderName")]
     public string SenderName { get; set; } = string.Empty;
 
     [BsonElement("receiverId")]
-    [BsonRepresentation(BsonType.ObjectId)]
     public string? ReceiverId { get; set; }
 
     /// <summary>

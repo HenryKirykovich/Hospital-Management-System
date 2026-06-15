@@ -15,7 +15,6 @@ public class Patient
 
     /// <summary>Optional reference to User.Id if the patient has a login account</summary>
     [BsonElement("userId")]
-    [BsonRepresentation(BsonType.ObjectId)]
     public string? UserId { get; set; }
 
     [BsonElement("firstName")]
@@ -74,7 +73,6 @@ public class MedicalRecord
     public string Treatment { get; set; } = string.Empty;
 
     [BsonElement("doctorId")]
-    [BsonRepresentation(BsonType.ObjectId)]
     public string? DoctorId { get; set; }
 
     [BsonElement("notes")]

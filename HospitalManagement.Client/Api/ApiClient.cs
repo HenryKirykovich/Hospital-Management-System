@@ -82,6 +82,23 @@ public static class ApiClient
     }
 
     /// <summary>
+    /// Sends a PATCH request with a JSON body.
+    /// </summary>
+    public static async Task PatchAsync(string path, object body)
+    {
+        AttachToken();
+        var json = JsonSerializer.Serialize(body);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _http.PatchAsync(path, content);
+        if (!response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"[{(int)response.StatusCode}] {responseBody}");
+        }
+    }
+
+    /// <summary>
     /// Sends a DELETE request.
     /// </summary>
     public static async Task DeleteAsync(string path)

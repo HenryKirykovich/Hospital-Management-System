@@ -1,4 +1,5 @@
 using HospitalManagement.Client.Session;
+using HospitalManagement.Shared.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace HospitalManagement.Client.Services;
@@ -17,7 +18,8 @@ public class SignalRService : IAsyncDisposable
     public event Action<object>? OnAppointmentUpdated;
     public event Action<object>? OnAppointmentStatusChanged;
     public event Action<string>? OnAppointmentDeleted;
-    public event Action<object>? OnInventoryUpdated;
+    public event Action<InventoryItem>? OnInventoryUpdated;
+    public event Action<string>? OnInventoryDeleted;
     public event Action<object>? OnLowStockAlert;
     public event Action<object>? OnChatMessage;
     public event Action<object>? OnVitalsUpdate;
@@ -67,8 +69,11 @@ public class SignalRService : IAsyncDisposable
         _connection.On<string>("AppointmentDeleted",
             id => OnAppointmentDeleted?.Invoke(id));
 
-        _connection.On<object>("InventoryUpdated",
+        _connection.On<InventoryItem>("InventoryUpdated",
             data => OnInventoryUpdated?.Invoke(data));
+
+        _connection.On<string>("InventoryDeleted",
+            id => OnInventoryDeleted?.Invoke(id));
 
         _connection.On<object>("LowStockAlert",
             data => OnLowStockAlert?.Invoke(data));

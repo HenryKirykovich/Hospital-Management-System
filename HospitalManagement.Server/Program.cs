@@ -53,6 +53,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
 
 // --- SignalR ---
 builder.Services.AddSignalR();

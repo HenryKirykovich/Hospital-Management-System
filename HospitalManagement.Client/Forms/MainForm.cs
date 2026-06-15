@@ -32,7 +32,7 @@ public partial class MainForm : Form
             ("🏠  Dashboard",    () => ShowPlaceholder("Dashboard — coming in Stage 6")),
             ("👥  Patients",     () => OpenForm(new PatientListForm())),
             ("📅  Appointments", () => OpenForm(new AppointmentListForm())),
-            ("💊  Inventory",    () => ShowPlaceholder("Inventory — coming in Stage 5")),
+            ("💊  Inventory",    () => OpenForm(new InventoryListForm())),
             ("📊  Analytics",    () => ShowPlaceholder("Analytics — coming in Stage 6")),
             ("💬  Chat",         () => ShowPlaceholder("Chat — coming in Stage 7")),
         };

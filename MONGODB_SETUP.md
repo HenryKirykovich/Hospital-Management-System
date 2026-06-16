@@ -75,3 +75,16 @@ mongodb://localhost:27017
 ```
 
 Select database: `Hospital-Management-System`
+
+---
+
+## Restore Database from Dump (optional)
+
+A pre-filled database dump is included in the `database-dump/` folder.
+If you want to load it instead of letting the app auto-seed:
+
+```powershell
+& "C:\Program Files\MongoDB\Tools\100\bin\mongorestore.exe" --drop "database-dump"
+```
+
+> **Note:** The app auto-seeds the database on first startup anyway — this step is optional.
